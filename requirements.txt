@@ -1,0 +1,7 @@
+python-dotenv
+rich
+bcrypt
+InquirerPy
+psutil
+threading
+webbrowser
