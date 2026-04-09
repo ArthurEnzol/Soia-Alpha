@@ -94,7 +94,7 @@ def menu():
                     break
             elif option[0] == "GitHub":
                 print("Abrindo GitHub...")
-                os.system("start https://github.com/ArthurEnzol")
+                os.system("start https://github.com/ArthurEnzol/SOIA")
                 sleep(2.5)
                 clear_lines(2)
             elif option[0] == "Suporte":
