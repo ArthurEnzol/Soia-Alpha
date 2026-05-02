@@ -1,15 +1,20 @@
 import os
+import platform
 import sys
-from pathlib import Path
-
 import typer
+
+
+from pathlib import Path
 from typing import Optional
 from dotenv import load_dotenv
+from colorist import ColorHex
 
 
+from src.utils.get_config import get_config
+from src.utils.config_handler import ensure_config
 from src.core.constants import SOIA_LOGO
 from src.core.loader import load_project
-from src.utils.directory import load_directory
+from src.utils.directory import load_directory, search_path_file 
 from src.ui.display import center_txt
 from src.ui.menu import menu
 from src.ui.menu_area import menu_area
@@ -17,6 +22,7 @@ from src.ui.menu_config import json_config, json_config_reset
 from src.utils.cli_commands import create_cli, help_flags_cli
 from src.utils.infosystem_cmd import run_infosystem_live
 from src.core.soia_IA import soia_prompt
+
 
 app = typer.Typer()
 load_dotenv()    
@@ -34,6 +40,32 @@ def config(reset: bool = typer.Option(False, "--reset", "-r", help="Reset your c
         json_config()
 
 @app.command()
+def env(
+    create: Optional[bool] = typer.Option(False, "--create", "-c", help="Create a virtual eviroment"),
+    install: Optional[bool] = typer.Option(False, "--install", "-i", help="Install all project dependeces")
+):
+    current_os = get_config("settings", "system")
+    if create:
+        name_env = get_config("commands", "env_name")
+        os.system(f"python -m venv .{name_env}")
+
+        if current_os == "Windows":
+            os.system(f"{search_path_file(name_env)}/Scripts/activate.bat" )
+        elif current_os == "Linux" or "Darwin":
+            os.system(f"source {search_path_file(name_env)}/Scripts/activate")
+    
+    if install:
+        local_directory = os.getcwd()
+
+        for source, directory, files in os.walk(local_directory):
+            if "requirements.txt" in files:
+                os.system("python3 -m pip install -r requirements.txt")
+                with open("requirements.txt", "r") as requirements:
+                    dependeces = list(line.strip() for line in requirements)
+                print(ColorHex("#00ff15"), (f"Dependênias instaladas com sucesso: {" ".join([dep for dep in dependeces])}"))
+
+
+@app.command()
 def git(
     init: bool = typer.Option(None, "--init", "-i", help= "Initialize de git repository"),
     add: Optional[str] = typer.Option(None, "--add", "-a", help= "Add files on commit"),
@@ -48,7 +80,13 @@ def git(
     if init:
         os.system(f'git init')
     if add:
-        os.system(f'git add {add}')
+        current_os = get_config("settings", "system")
+        if current_os == "Windows":
+            initial_directory = "C://"
+        else: 
+            initial_directory = "/"
+        path_file = search_path_file(add, initial_directory)   
+        os.system(f"git add '{path_file}'")
     if commit:
         os.system(f'git commit -m "{commit}"')
     if push:
@@ -115,11 +153,13 @@ def main(
     ctx: typer.Context,
 ):
 
+    ensure_config()
     
     if ctx.invoked_subcommand is not None:
         return
     os.system('cls' if os.name == 'nt' else 'clear')
     
+    ensure_config()
     center_txt(SOIA_LOGO)
     load_project(load_directory())
 
