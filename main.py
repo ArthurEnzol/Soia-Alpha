@@ -202,8 +202,6 @@ def main(
 ):
     ensure_config()
 
-
-
     if ctx.invoked_subcommand is not None:
         return
     os.system('cls' if os.name == 'nt' else 'clear')
