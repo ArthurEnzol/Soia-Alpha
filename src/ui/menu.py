@@ -1,10 +1,12 @@
 from src.auth.login import login
 from src.auth.password_manager import save_password
 from src.ui.terminal import clear_lines
+from src.utils.get_config import get_config
 from time import sleep
 from InquirerPy import prompt
 import os
 import getpass
+import subprocess
 
 def show_menu():
     """Exibe o menu principal e retorna a opção selecionada."""
@@ -94,7 +96,15 @@ def menu():
                     break
             elif option[0] == "GitHub":
                 print("Abrindo GitHub...")
-                os.system("start https://github.com/ArthurEnzol/SOIA")
+                system = get_config("settings", "system")
+
+                match system:
+                    case "Linux":
+                        subprocess.run("xdg-open https://github.com/ArthurEnzol/SOIA")
+                    case "Windows":
+                        subprocess.run("start https://github.com/ArthurEnzol/SOIA")
+                    case "Darwin":
+                        subprocess.run("open -a 'Google Chrome' https://github.com/ArthurEnzol/SOIA")
                 sleep(2.5)
                 clear_lines(2)
             elif option[0] == "Suporte":
