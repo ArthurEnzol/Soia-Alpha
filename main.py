@@ -82,8 +82,12 @@ def git(
     abs_path = os.getcwd()
 
     if init:
-        subprocess.run(f"cd '{abs_path}'")
-        subprocess.run(f'git init')
+        try:
+            os.chdir(abs_path)
+            subprocess.run(f"cd '{abs_path}'")
+            subprocess.run(f'git init')
+        except Exception as e:
+            print(ColorHex("#DB4437"), f"Ocorreu um erro: {e}")
     if add:
         current_os = get_config("settings", "system")
         if current_os == "Windows":
