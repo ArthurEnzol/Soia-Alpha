@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 import json
+import subprocess
 
 # Configurações de caminhos
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -124,6 +125,8 @@ def soia(prompt: str):
             ]
         )
         return response['message']['content']
+    except ValueError:
+        subprocess.run("ollama pull llama3.1:8b")
     except Exception as e:
         return f"Error: {e}"
 
