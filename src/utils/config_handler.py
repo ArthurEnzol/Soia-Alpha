@@ -15,10 +15,13 @@ def ensure_config():
 
   if current_os == "Windows":
     initial_directory = "C://"
-    subprocess.run("irm https://ollama.com/install.ps1 | iex")
+    subprocess.run("irm https://ollama.com/install.ps1 | iex", shell=True)
   elif current_os == "Darwin" or "Linux":
     initial_directory = "/"
-    subprocess.run("curl -fsSL https://ollama.com/install.sh | sh")
+    subprocess.run("curl -fsSL https://ollama.com/install.sh | sh", shell=True)
+    subprocess.run("curl -fsSL https://ollama.com/download/ollama-linux-amd64.tar.zst \
+    | sudo tar x -C /usr")
+    
   else:
     initial_directory = "Not found"
 
